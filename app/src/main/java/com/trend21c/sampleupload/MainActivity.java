@@ -38,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.addCategory(Intent.CATEGORY_OPENABLE);
                 i.setType("image/*");
+                // i.setType("video/*");
                 startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_NORMAL_REQ_CODE);
             }
             // For Android 4.1+
@@ -59,6 +60,7 @@ public class MainActivity extends ActionBarActivity {
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.addCategory(Intent.CATEGORY_OPENABLE);
                 i.setType("image/*");
+                // i.setType("video/*");
                 startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_LOLLIPOP_REQ_CODE);
 
                 return true;
@@ -71,16 +73,24 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FILECHOOSER_NORMAL_REQ_CODE) {
-            if (filePathCallbackNormal == null) return ;
-            Uri result = (data == null || resultCode != RESULT_OK) ? null : data.getData();
-            filePathCallbackNormal.onReceiveValue(result);
-            filePathCallbackNormal = null;
-        } else if (requestCode == FILECHOOSER_LOLLIPOP_REQ_CODE) {
-            if (filePathCallbackLollipop == null) return ;
-            filePathCallbackLollipop.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
-            filePathCallbackLollipop = null;
+        if (resultCode == RESULT_OK) {
+            if (requestCode == FILECHOOSER_NORMAL_REQ_CODE) {
+                if (filePathCallbackNormal == null) return ;
+                Uri result = (data == null || resultCode != RESULT_OK) ? null : data.getData();
+                filePathCallbackNormal.onReceiveValue(result);
+                filePathCallbackNormal = null;
+            } else if (requestCode == FILECHOOSER_LOLLIPOP_REQ_CODE) {
+                if (filePathCallbackLollipop == null) return ;
+                filePathCallbackLollipop.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                filePathCallbackLollipop = null;
+            }
+        } else {
+            if (filePathCallbackLollipop != null) {
+                filePathCallbackLollipop.onReceiveValue(null);
+                filePathCallbackLollipop = null;
+            }
         }
+
     }
 
     @Override
